@@ -4,19 +4,6 @@
 #include<vector>
 using namespace std;
 
-// void v_add(double* x, double* y, double* z, int t) {
-//   #pragma omp parallel
-//   {
-//     #pragma omp for
-//     for(int i=0; i<t; i++)
-//       z[i] = x[i] + y[i];
-//   }
-//   for (int i = 0; i < t; i++)
-//   {
-//       cout<<z[i];
-//   }
-  
-// }
 
 int main( int ac, char **av)
 {
