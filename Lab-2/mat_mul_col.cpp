@@ -1,4 +1,3 @@
-
 #include<bits/stdc++.h>
 // #include<vector>
 #include<iostream>
@@ -6,11 +5,11 @@ using namespace std;
 #include <omp.h>
 int main()
 // n is the array size
-{       const long int n = 999;
+{       const long int n = 100;
         // const int num_of_threads = 1;
         double start,end;
         // vector<vector<unsigned long>> temp,a,b,c;
-        unsigned long temp[999][999],a[999][999],b[999][999],c[999][999];
+        unsigned long temp[100][100],a[100][100],b[100][100],c[100][100];
         for (unsigned long i = 0; i < n; i++) {
             for (unsigned long j = 0; j < n; j++)
             {
