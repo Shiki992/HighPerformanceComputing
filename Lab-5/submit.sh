@@ -7,4 +7,4 @@
  
 cd $PBS_O_WORKDIR/
 
-/soft/openmpi-4.0.1/bin/mpirun -machinefile $PBS_NODEFILE -np 100 ./hello
+/soft/openmpi-4.0.1/bin/mpirun -machinefile $PBS_NODEFILE -np 100 ./vecmul
