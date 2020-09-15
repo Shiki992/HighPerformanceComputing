@@ -13,8 +13,8 @@ int main(int argc, char **argv)
         }
    */
         int node;
-        int world_size,cnt=0;
-        double start, end,tsum = 0;
+        int world_size;
+        double start, end;
         srand(time(NULL));
         MPI_Init(&argc,&argv);
         start = MPI_Wtime();
@@ -23,11 +23,16 @@ int main(int argc, char **argv)
 
         if(node == 0)
         {
-                double a[100000],b[100000],c[100000];
+                double a[100000][100000],b[100000][100000],c[100000][100000];
                  for(int i=0;i<100000;i++)
                 {
-                        a[i]= pow(2,15)+rand()+0.13246549884;
-                        b[i]= pow(2,16)+rand()+0.75245496088;
+                    for (size_t j = 0; j < 100000; j++)
+                    {
+                        
+                        a[i][j]= pow(2,15)+rand()+0.13246549884;
+                        b[i][j]= pow(2,16)+rand()+0.75245496088;
+                    }
+                    
 
                 }
                 int load_per_proc;
@@ -45,9 +50,9 @@ int main(int argc, char **argv)
                         for(int i=1;i<world_size;i++)
                         {       MPI_Send(&load_per_proc,1,MPI_INT,i,1,MPI_COMM_WORLD);  
 
-                                MPI_Send(&a,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD);
+                                MPI_Send(&a,10000000000,MPI_DOUBLE,i,0,MPI_COMM_WORLD);
 
-                                MPI_Send(&b,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD); 
+                                MPI_Send(&b,10000000000,MPI_DOUBLE,i,0,MPI_COMM_WORLD); 
                         }
                         int n1,remi,j;
                         for(int i1=1;i1<world_size;i1++)
@@ -60,14 +65,18 @@ int main(int argc, char **argv)
                         int rem = (world_size-1)*load_per_proc;
                         for(int ii= rem;ii<100000;ii++)
                         {
-                              c[ii]=a[ii]*b[ii];
+                            for (size_t jj = rem; jj < 100000; jj++)
+                            {
+                                c[ii][jj]=a[ii][jj]+b[ii][jj];
+                            }
+                            
                         }
 
                 }
                 else
                 {
                         for(int i=0;i<100000;i++)
-                                c[i]=a[i]*b[i];
+                                c[i]=a[i]+b[i];
 
                 }
 
@@ -88,7 +97,7 @@ int main(int argc, char **argv)
 
 
                 for(int i=(node-1)*load_per_proc,j=0;i<node*load_per_proc;i++,j++)
-                        c[j]=a[i]*b[i];
+                        c[j]=a[i]+b[i];
 
                  MPI_Send(&c,load_per_proc,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
 
@@ -96,13 +105,8 @@ int main(int argc, char **argv)
          end = MPI_Wtime();
         if(node == 0)
                  printf(" time taken :: %f \n",end-start);
-                 tsum+=end-start;
-                 cnt++;
-
 
         MPI_Finalize();
-        double avg = tsum/cnt;
-        printf("avg = %f \n",avg);
 
 return 0;
 }
