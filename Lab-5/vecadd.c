@@ -5,6 +5,13 @@
 #include<math.h>
 int main(int argc, char **argv)
 {
+  /* double a[1000],b[1000];
+   for(int i=0;i<100000;i++)
+        {       a[i]= pow(2,15)+rand()+0.13246549884;//rand();
+                b[i]= pow(2,16)+rand()+0.75245496088;//rand();
+                //printf("%f   %f\n",a[i],b[i]);
+        }
+   */
         int node;
         int world_size;
         double start, end;
@@ -36,18 +43,18 @@ int main(int argc, char **argv)
                 if(world_size>1)
                 {
                         for(int i=1;i<world_size;i++)
-                        {       MPI_Send(&load_per_proc,1,MPI_INT,i,1,MPI_COMM_W                                                                                        ORLD);
+                        {       MPI_Send(&load_per_proc,1,MPI_INT,i,1,MPI_COMM_WORLD);  
 
-                                MPI_Send(&a,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD                                                                                        );
+                                MPI_Send(&a,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD);
 
-                                MPI_Send(&b,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD                                                                                        );
+                                MPI_Send(&b,100000,MPI_DOUBLE,i,0,MPI_COMM_WORLD); 
                         }
                         int n1,remi,j;
                         for(int i1=1;i1<world_size;i1++)
                         {
-                                 MPI_Recv(&n1,1,MPI_INT,MPI_ANY_SOURCE,2,MPI_COM                                                                                        M_WORLD,&status);
-                                MPI_Recv(&c1,load_per_proc,MPI_DOUBLE,MPI_ANY_SO                                                                                        URCE,0,MPI_COMM_WORLD,&status);
-                                for(int i=(n1-1)*load_per_proc,j=0;i<(n1)*load_p                                                                                        er_proc;i++,j++)
+                                 MPI_Recv(&n1,1,MPI_INT,MPI_ANY_SOURCE,2,MPI_COMM_WORLD,&status);
+                                MPI_Recv(&c1,load_per_proc,MPI_DOUBLE,MPI_ANY_SOURCE,0,MPI_COMM_WORLD,&status);
+                                for(int i=(n1-1)*load_per_proc,j=0;i<(n1)*load_per_proc;i++,j++)
                                         c[i]=c1[j];
                         }
                         int rem = (world_size-1)*load_per_proc;
@@ -59,30 +66,28 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    for(int i=0;i<100000;i++)
-                    c[i]=a[i]+b[i];
+                        for(int i=0;i<100000;i++)
+                                c[i]=a[i]+b[i];
 
                 }
 
         }
-        else 
+        else           
         {
                 double a[100000],b[100000];
                 MPI_Status status;
                 int load_per_proc;
-                MPI_Recv(&load_per_proc,1,MPI_INT,0,1,MPI_COMM_WORLD,&status); /                                                                                        /receiving load/process
+                MPI_Recv(&load_per_proc,1,MPI_INT,0,1,MPI_COMM_WORLD,&status);          
 
-                MPI_Recv(&a,100000,MPI_DOUBLE,0,0,MPI_COMM_WORLD,&status);     /                                                                                        /receiving a
-
-                MPI_Recv(&b,100000,MPI_DOUBLE,0,0,MPI_COMM_WORLD,&status);     /                                                                                        /receiving b
-
+                MPI_Recv(&a,100000,MPI_DOUBLE,0,0,MPI_COMM_WORLD,&status);                
+                MPI_Recv(&b,100000,MPI_DOUBLE,0,0,MPI_COMM_WORLD,&status);                 
                 double c[load_per_proc];
                 int j,rem;
                  MPI_Send(&node,1,MPI_INT,0,2,MPI_COMM_WORLD);
 
 
 
-                for(int i=(node-1)*load_per_proc,j=0;i<node*load_per_proc;i++,j+                                                                                        +)
+                for(int i=(node-1)*load_per_proc,j=0;i<node*load_per_proc;i++,j++)
                         c[j]=a[i]+b[i];
 
                  MPI_Send(&c,load_per_proc,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
@@ -93,5 +98,6 @@ int main(int argc, char **argv)
                  printf(" time taken :: %f \n",end-start);
 
         MPI_Finalize();
+
 return 0;
 }
