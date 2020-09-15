@@ -95,9 +95,9 @@ int main(int argc, char **argv)
         }
          end = MPI_Wtime();
         if(node == 0)
-                 printf(" time taken :: %f \n",end-start);
-                 tsum+=end-start;
-                 cnt++;
+            {printf(" time taken :: %f \n",end-start);
+            tsum+=end-start;
+            cnt++;}
 
 
         MPI_Finalize();

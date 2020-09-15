@@ -13,8 +13,8 @@ int main(int argc, char **argv)
         }
    */
         int node;
-        int world_size;
-        double start, end;
+        int world_size,cnt=0;
+        double start, end,tsum = 0;
         srand(time(NULL));
         MPI_Init(&argc,&argv);
         start = MPI_Wtime();
@@ -95,9 +95,14 @@ int main(int argc, char **argv)
         }
          end = MPI_Wtime();
         if(node == 0)
-                 printf(" time taken :: %f \n",end-start);
+                 {printf(" time taken :: %f \n",end-start);
+                                  tsum+=end-start;
+                 cnt++;}
+
 
         MPI_Finalize();
+        double avg = tsum/cnt;
+        printf("avg = %f \n",avg);
 
 return 0;
 }
