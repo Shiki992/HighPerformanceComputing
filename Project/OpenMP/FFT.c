@@ -1,7 +1,9 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<math.h>
+#include "omp.h"
 #define PI 3.14159265
-#define n 1000
+#define n 100
  
 int main(int argc, char **argv) {
     unsigned long realOut[n][n];
@@ -58,8 +60,8 @@ int main(int argc, char **argv) {
                                     + imagOut[yWave][xWave]
                                             * imagOut[yWave][xWave]);
                 }
-                printf(" %e + %e i (%e)\n", realOut[yWave][xWave],
-                        imagOut[yWave][xWave], amplitudeOut[yWave][xWave]);
+//                printf(" %e + %e i (%e)\n", realOut[yWave][xWave],
+//                        imagOut[yWave][xWave], amplitudeOut[yWave][xWave]);
             }
         }
     }}
