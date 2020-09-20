@@ -1,6 +1,7 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include<math.h>
 
 #define NRA 1000                 /* number of rows in matrix A */
 #define NCA 1000               /* number of columns in matrix A */
@@ -19,7 +20,7 @@ int	numtasks,
 	mtype,                 /* message type */
 	rows,                  /* rows of matrix A sent to each worker */
 	averow, extra, offset, /* used to determine rows sent to each worker */
-	i, j, k, rc;           
+	i, j, k, rc,cnt;           
 unsigned long	a[NRA][NCA],           /* matrix A to be multiplied */
 	b[NCA][NCB],           /* matrix B to be multiplied */
 	c[NRA][NCB];           /* result matrix C */
@@ -113,7 +114,7 @@ numworkers = numtasks-1;
       MPI_Send(&c, rows*NCB, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD);
    }
    end = MPI_Wtime();
-        if(node == 0)
+        if(taskid == MASTER)
             {printf(" time taken :: %f \n",end-start);
             tsum+=end-start;
             cnt++;}
