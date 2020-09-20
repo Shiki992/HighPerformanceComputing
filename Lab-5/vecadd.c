@@ -5,16 +5,10 @@
 #include<math.h>
 int main(int argc, char **argv)
 {
-  /* double a[1000],b[1000];
-   for(int i=0;i<100000;i++)
-        {       a[i]= pow(2,15)+rand()+0.13246549884;//rand();
-                b[i]= pow(2,16)+rand()+0.75245496088;//rand();
-                //printf("%f   %f\n",a[i],b[i]);
-        }
-   */
         int node;
         int world_size,cnt=0;
         double start, end,tsum = 0;
+        unsigned long a[100000],b[100000],c[100000];
         srand(time(NULL));
         MPI_Init(&argc,&argv);
         start = MPI_Wtime();
@@ -23,7 +17,7 @@ int main(int argc, char **argv)
 
         if(node == 0)
         {
-                double a[100000],b[100000],c[100000];
+                
                  for(int i=0;i<100000;i++)
                 {
                         a[i]= pow(2,15)+rand()+0.13246549884;

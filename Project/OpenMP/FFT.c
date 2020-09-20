@@ -54,7 +54,6 @@ int main(int argc, char **argv) {
                             2 * PI * ((1.0 * xWave * xSpace / width) + (1.0
                                     * yWave * ySpace / height)))) / sqrt(
                             width * height);
-                    #pragma omp critical
                     amplitudeOut[yWave][xWave] = sqrt(
                             realOut[yWave][xWave] * realOut[yWave][xWave]
                                     + imagOut[yWave][xWave]

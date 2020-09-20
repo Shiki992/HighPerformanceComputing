@@ -100,11 +100,23 @@ numworkers = numtasks-1;
       MPI_Recv(&a, rows*NCA, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD, &status);
       MPI_Recv(&b, NCA*NCB, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD, &status);
 
-      for (k=0; k<NCB; k++)
-         for (i=0; i<rows; i++)
-         {
-            c[i][k] = a[i][k] + b[i][k];
-         }
+              for(unsigned long jj=0;jj<n;jj+= 10){
+            
+            for(unsigned long kk=0;kk<n;kk+= 10){
+                    
+                    for(unsigned long i=0;i<n;i++){
+                            
+                            for(unsigned long j = jj; j<((jj+10)>n?n:(jj+10)); j++){
+                                    unsigned long temp = 0;
+                                    
+                                    for(unsigned long k = kk; k<((kk+10)>n?n:(kk+10)); k++){
+                                            temp += a[i][k]*b[k][j];
+                                    }
+                                    c[i][j] += temp;
+                            }
+                    }
+            }
+        }
       mtype = FROM_WORKER;
       MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
       MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);

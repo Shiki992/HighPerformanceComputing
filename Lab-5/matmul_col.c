@@ -11,16 +11,16 @@
 
 int main (int argc, char *argv[])
 {
-int	numtasks,              /* number of tasks in partition */
-	taskid,                /* a task identifier */
-	numworkers,            /* number of worker tasks */
-	source,                /* task id of message source */
-	dest,                  /* task id of message destination */
+int	numtasks,              
+	taskid,                
+	numworkers,            
+	source,                	
+   dest,                  
 	mtype,                 /* message type */
 	rows,                  /* rows of matrix A sent to each worker */
 	averow, extra, offset, /* used to determine rows sent to each worker */
-	i, j, k, rc;           /* misc */
-double	a[NRA][NCA],           /* matrix A to be multiplied */
+	i, j, k, rc;           
+unsigned long	a[NRA][NCA],           /* matrix A to be multiplied */
 	b[NCA][NCB],           /* matrix B to be multiplied */
 	c[NRA][NCB];           /* result matrix C */
 MPI_Status status;
@@ -97,8 +97,8 @@ numworkers = numtasks-1;
       mtype = FROM_MASTER;
       MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
       MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
-      MPI_Recv(&a, rows*NCA, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
-      MPI_Recv(&b, NCA*NCB, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
+      MPI_Recv(&a, rows*NCA, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD, &status);
+      MPI_Recv(&b, NCA*NCB, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD, &status);
 
       for (k=0; k<NCB; k++)
          for (i=0; i<rows; i++)
@@ -110,7 +110,7 @@ numworkers = numtasks-1;
       mtype = FROM_WORKER;
       MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
       MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-      MPI_Send(&c, rows*NCB, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+      MPI_Send(&c, rows*NCB, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }
