@@ -23,9 +23,11 @@ int	numtasks,
 unsigned long	a[NRA][NCA],           /* matrix A to be multiplied */
 	b[NCA][NCB],           /* matrix B to be multiplied */
 	c[NRA][NCB];           /* result matrix C */
+double start, end,tsum = 0;
 MPI_Status status;
 
 MPI_Init(&argc,&argv);
+start = MPI_Wtime();
 MPI_Comm_rank(MPI_COMM_WORLD,&taskid);
 MPI_Comm_size(MPI_COMM_WORLD,&numtasks);
 if (numtasks < 2 ) {
@@ -122,5 +124,12 @@ numworkers = numtasks-1;
       MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
       MPI_Send(&c, rows*NCB, MPI_DOUBLE_PRECISION , MASTER, mtype, MPI_COMM_WORLD);
    }
+   end = MPI_Wtime();
+        if(node == 0)
+            {printf(" time taken :: %f \n",end-start);
+            tsum+=end-start;
+            cnt++;}
    MPI_Finalize();
+   double avg = tsum/cnt;
+        printf("avg = %f \n",avg);
 }
