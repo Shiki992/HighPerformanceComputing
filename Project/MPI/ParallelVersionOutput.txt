@@ -34,7 +34,7 @@ XR[9]: 35.7809 XI[9]: 33.4437
 ================================
 XR[10]: 35.8227 XI[10]: 33.3926 
 ================================
-Time Elaspsed on Iteration 1: 50.471241 Seconds
+Time Elaspsed on Iteration 1: 51.823761 Seconds
  
 
  TOTAL PROCESSED SAMPLES : 16384
@@ -71,7 +71,7 @@ XR[9]: 35.7809 XI[9]: 33.4437
 ================================
 XR[10]: 35.8227 XI[10]: 33.3926 
 ================================
-Time Elaspsed on Iteration 2: 43.499877 Seconds
+Time Elaspsed on Iteration 2: 46.386566 Seconds
  
 
  TOTAL PROCESSED SAMPLES : 16384
@@ -108,6 +108,6 @@ XR[9]: 35.7809 XI[9]: 33.4437
 ================================
 XR[10]: 35.8227 XI[10]: 33.3926 
 ================================
-Time Elaspsed on Iteration 3: 42.477090 Seconds
+Time Elaspsed on Iteration 3: 52.679722 Seconds
 
-Average Time Elaspsed: 45.482736 Seconds
+Average Time Elaspsed: 50.296683 Seconds

@@ -1,70 +1,126 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include "omp.h"
-#define PI 3.14159265
-#define n 100
- 
-int main(int argc, char **argv) {
-    unsigned long realOut[n][n];
-    unsigned long imagOut[n][n];
-    unsigned long amplitudeOut[n][n];
- 
-    int height = n;
-    int width = n;
-    int yWave;
-    int xWave;
-    int ySpace;
-    int xSpace;
-    int i, j;
-    double start,end;
-    unsigned long inputData[n][n];
-    for (unsigned long i = 0; i < n; i++) 
-        {
-            for (unsigned long j = 0; j < n; j++)
-            {
-                unsigned long x=1e5;
-                inputData[i][j] = 1e5 + rand()%x;
-            }
-        }
-            start= omp_get_wtime();
-    
- 
-    #pragma omp parallel
+#include <stdio.h>
+#include <complex.h> //to use complex numbers
+#include <math.h>	//for cos() and sin()
+// #include "timer.h" //to use timer
+#include<omp.h>
 
-    // Two outer loops iterate on output data.
-{
-    #pragma omp parallel for
-        for (yWave = 0; yWave < height; yWave++) {
-        #pragma omp parallel for
-        for (xWave = 0; xWave < width; xWave++) {
-            // Two inner loops iterate on input data.
+#define PI 3.14159265
+#define bigN 10000 //Problem Size
+#define howmanytimesavg 3 //How many times do I wanna run for the AVG?
+int main()
+{	
+	double avgtime = 0;
+	int h;
+	FILE *outfile;
+	outfile = fopen("sequentialVersionOutput.txt", "w"); //oepn from current directory
+
+	for(h = 0;h < howmanytimesavg; h++ )  //loop how many times you want to avg over
+	{
+		double start,finish; //For time
+		start = omp_get_wtime(); //start the timer
+											
+		double table[bigN][3] = 
+								{
+								 0,3.6,2.6, //n, Real,Imaginary CREATES TABLE
+								 1,2.9,6.3,
+								 2,5.6,4.0,
+								 3,4.8,9.1,
+								 4,3.3,0.4,
+								 5,5.9,4.8,
+								 6,5.0,2.6,
+								 7,4.3,4.1,
+								 };
+							  
+		double complex evenpart[bigN/2]; //array to save the data for EVENHALF
+		double complex oddpart[bigN/2]; //array to save the data for ODDHALF
+		double storeKsumreal[bigN]; //store the K real variable so we can abuse symmerty
+		double storeKsumimag[bigN]; //store the K imaginary variable so we can abuse symmerty
+		int k, i ,j;
+        #pragma omp parallel 
+		if(bigN > 8)  //Everything after row 8 is all 0's
+		{
+			for(i = 8; i < bigN; i++)
+			{
+				table[i][0] = i;
+				for(j = 1; j < 3;j++)
+				{
+					table[i][j] = 0.0; //set to 0.0
+				}
+			}
+		}
+        #pragma omp parallel
+        {
             #pragma omp parallel for
-            for (ySpace = 0; ySpace < height; ySpace++) {
+            for (k = 0; k < bigN / 2; k++ ) //K loop
+            {	
+                /* Variables used for the computation */
+                double sumrealeven = 0.0; //sum of real numbers for even
+                double sumimageven = 0.0; //sum of imaginary numbers for even
+                double sumrealodd = 0.0; //sum of real numbers for odd
+                double sumimagodd = 0.0; //sum of imaginary numbers for odd
                 #pragma omp parallel for
-                for (xSpace = 0; xSpace < width; xSpace++) {
-                    // Compute real, imag, and ampltude.
-                    #pragma omp critical
-                    realOut[yWave][xWave] += (inputData[ySpace][xSpace] * cos(
-                            2 * PI * ((1.0 * xWave * xSpace / width) + (1.0
-                                    * yWave * ySpace / height)))) / sqrt(
-                            width * height);
-                    #pragma omp critical        
-                    imagOut[yWave][xWave] -= (inputData[ySpace][xSpace] * sin(
-                            2 * PI * ((1.0 * xWave * xSpace / width) + (1.0
-                                    * yWave * ySpace / height)))) / sqrt(
-                            width * height);
-                    amplitudeOut[yWave][xWave] = sqrt(
-                            realOut[yWave][xWave] * realOut[yWave][xWave]
-                                    + imagOut[yWave][xWave]
-                                            * imagOut[yWave][xWave]);
+                for (i = 0; i <= (bigN/2 - 1); i++) //loop for series 0->N/2 -1
+                {
+                    /* -------- EVEN PART -------- */
+                    double realeven = table[2*i][1]; //Access table for real number at spot 2i
+                    double complex imaginaryeven = table[2*i][2]; //Access table for imaginary number at spot 2i
+                    double complex componeeven = (realeven + imaginaryeven * I); //Create the first component from table
+
+                    double factoreven = ((2*PI)*((2*i)*k))/bigN; //Calculates the even factor for Cos() and Sin()
+                    
+                    double complex comptwoeven = (cos(factoreven) - (sin(factoreven)*I)); //Create the second component
+
+                    evenpart[i] = (componeeven * comptwoeven); //store in the evenpart array
+                    
+                    /* -------- ODD PART -------- */
+                    double realodd = table[2*i + 1][1]; //Access table for real number at spot 2i+1
+                    double complex imaginaryodd = table[2*i + 1][2]; //Access table for imaginary number at spot 2i+1
+                    double complex componeodd = (realodd + imaginaryodd * I); //Create the first component from table
+                    
+                    double factorodd = ((2*PI)*((2*i+1)*k))/bigN;//Calculates the odd factor for Cos() and Sin()
+                                                                
+                    double complex comptwoodd = (cos(factorodd) - (sin(factorodd)*I));//Create the second component
+
+                    oddpart[i] = (componeodd * comptwoodd); //store in the oddpart array
+                    
                 }
-//                printf(" %e + %e i (%e)\n", realOut[yWave][xWave],
-//                        imagOut[yWave][xWave], amplitudeOut[yWave][xWave]);
+                #pragma omp parallel for
+                for(i = 0; i < bigN/2; i++) //loop to sum the EVEN and ODD parts
+                {
+                    #pragma omp critical
+                    sumrealeven += creal(evenpart[i]); //sums the realpart of the even half
+                    #pragma omp critical
+                    sumimageven += cimag(evenpart[i]); //sums the imaginarypart of the even half
+                    #pragma omp critical
+                    sumrealodd += creal(oddpart[i]); //sums the realpart of the odd half
+                    #pragma omp critical
+                    sumimagodd += cimag(oddpart[i]); //sums the imaginary part of the odd half
+                }
+                
+                storeKsumreal[k] = sumrealeven + sumrealodd; //add the calculated reals from even and odd
+                storeKsumimag[k] = sumimageven + sumimagodd; //add the calculated imaginary from even and odd
+                
+                storeKsumreal[k + bigN/2] = sumrealeven - sumrealodd; //ABUSE symmetry Xkreal + N/2 = Evenk - OddK
+                storeKsumimag[k + bigN/2] = sumimageven - sumimagodd; //ABUSE symmetry Xkimag + N/2 = Evenk - OddK
+                if(k <= 10) //Do the first 10 K's
+                {
+                    if(k == 0)
+                    {
+                        fprintf(outfile," \n\nTOTAL PROCESSED SAMPLES : %d\n",bigN);
+                    }
+                    fprintf(outfile,"================================\n");
+                    fprintf(outfile,"XR[%d]: %.4f XI[%d]: %.4f \n",k,storeKsumreal[k],k,storeKsumimag[k]);
+                    fprintf(outfile,"================================\n");
+                }
             }
         }
-    }}
-    end= omp_get_wtime();
-    printf(" time taken :: %f \n",end-start);
-    return 0;
+		finish = omp_get_wtime(); //stop timer
+		double timeElapsed = finish-start; //Time for that iteration
+		avgtime = avgtime + timeElapsed; //AVG the time 
+		fprintf(outfile,"Time Elaspsed on Iteration %d: %f Seconds\n", (h+1),timeElapsed);
+	}
+	avgtime = avgtime / howmanytimesavg;
+	fprintf(outfile,"\nAverage Time Elaspsed: %f Seconds", avgtime);
+	fclose(outfile); //close file
+	return 0;
 }
